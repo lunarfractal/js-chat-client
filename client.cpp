@@ -1,3 +1,5 @@
+#define ASIO_STANDALONE
+
 #include <websocketpp/client.hpp>
 #include <websocketpp/config/asio_client.hpp>
 
@@ -6,10 +8,11 @@
 
 #include <nlohmann/json.hpp>
 
-#define COLOR_BLUE  "\033[34m"
-#define COLOR_WHITE "\033[37m"
-#define COLOR_GREY  "\033[90m"
-#define COLOR_RESET "\033[0m"
+const std::string COLOR_BLUE = "\033[34m";
+const std::string COLOR_WHITE = "\033[37m";
+const std::string COLOR_GREY = "\033[90m";
+const std::string COLOR_RESET = "\033[0m";
+
 
 typedef websocketpp::client<websocketpp::config::asio_client> client;
 typedef websocketpp::connection_hdl connection_hdl;
@@ -20,13 +23,13 @@ typedef websocketpp::lib::asio::ssl::context ssl_context;
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 
-void print_message(std::string &username, std::string &text, std::string &timestamp) {
+void print_message(std::string username, std::string text, std::string timestamp) {
     struct winsize w;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
     int term_width = w.ws_col;
 
-    std::string user_text = COLOR_BLUE + username + ": " + COLOR_WHITE + text + COLOR_RESET;
-    std::string time_text = COLOR_GREY + "[" + timestamp + "]" + COLOR_RESET;
+    std::string user_text = COLOR_BLUE + username + std::string(": ") + COLOR_WHITE + text + COLOR_RESET;
+    std::string time_text = COLOR_GREY + std::string("[") + timestamp + std::string("]") + COLOR_RESET;
 
     int spacing = term_width - (int)(user_text.length() + time_text.length());
     if (spacing < 1) spacing = 1;
@@ -72,7 +75,7 @@ void on_message(client* c, connection_hdl hdl, message_ptr msg) {
 }
 
 void on_open(client* c, connection_hdl* connection, connection_hdl hdl) {
-  print_message("<system>", "Connected!", ""):
+  print_message("<system>", "Connected!", "");
   *connection = hdl;
 }
 
