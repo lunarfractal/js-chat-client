@@ -11,7 +11,7 @@
 #define COLOR_GREY  "\033[90m"
 #define COLOR_RESET "\033[0m"
 
-typedef websocketpp::client<websocketpp::config::asio_tls_client> client;
+typedef websocketpp::client<websocketpp::config::asio_client> client;
 typedef websocketpp::connection_hdl connection_hdl;
 typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
 
@@ -64,10 +64,10 @@ void on_message(client* c, connection_hdl hdl, message_ptr msg) {
         std::cerr << "Unknown data message type " << type << std::endl;
       }
     }
-    else
-    {
-      std::cerr << "Unknown server message type " << type << std::endl;
-    }
+  }
+  else
+  {
+    std::cerr << "Unknown server message type " << type << std::endl;
   }
 }
 
@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
 
   c.init_asio();
 
-  c.set_tls_init_handler(websocketpp::lib::bind(&on_tls_init));
+  //c.set_tls_init_handler(websocketpp::lib::bind(&on_tls_init));
 
   c.set_open_handler(websocketpp::lib::bind(&on_open, &c, &hdl, ::_1));
 
@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
       done = true;
       c.close(hdl, websocketpp::close::status::normal, "done");
     } else {
-      send_text_message(&c, &hdl, "{\"type\":\"message\",\"content\":\"" + input + "\"}";
+      send_text_message(&c, &hdl, "{\"type\":\"message\",\"content\":\"" + input + "\"}");
     }
   }
 
