@@ -15,12 +15,12 @@ typedef websocketpp::client<websocketpp::config::asio_tls_client> client;
 typedef websocketpp::connection_hdl connection_hdl;
 typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
 
-tyepdef websocketpp::lib::asio::ssl::context ssl_context;
+typedef websocketpp::lib::asio::ssl::context ssl_context;
 
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 
-void print_message(std::string &username, std::string &text, std::string &timestamp) 
+void print_message(std::string &username, std::string &text, std::string &timestamp) {
     struct winsize w;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
     int term_width = w.ws_col;
@@ -40,47 +40,35 @@ void send_text_message(client* c, connection_hdl* connection, std::string msg) {
   c->send(*connection, msg, websocketpp::frame::opcode::text);
 }
 
-void on_message(client* client, connection_hdl hdl, message_ptr msg) {
+void on_message(client* c, connection_hdl hdl, message_ptr msg) {
   nlohmann::json data = nlohmann::json::parse(msg->get_payload());
   std::string type = data["type"];
-  switch(type) {
-    case "chat":
-    {
-      print_message(data["username"], data["text"], data["timestamp"]);
-      break;
-    }
-    case "system":
-    {
-      print_message("<system>", data["text"], data.value("timestamp", ""));
-      break;
-    }
-    case "history":
-    {
-      for(const auto& message: data["messages"]) {
-        switch(message["type"]) {
-          case "chat":
-          {
-            print_message(data["username"], data["text"], data["timestamp"]);
-            break:
-          }
-          case "system":
-          {
-            print_message("<system>", data["text"], data.value("timestamp", ""));
-            break;
-          }
-          default:
-          {
-            std::cerr << "Unknown data message type " << type << std::endl;
-            break;
-          }
-        }
+  if(type == "chat")  {
+    print_message(data["username"], data["text"], data["timestamp"]);
+    break;
+  }
+  else if(type == "system") {
+    print_message("<system>", data["text"], data.value("timestamp", ""));
+    break;
+  }
+  else if(type == "history") {
+    for(const auto& message: data["messages"]) {
+      std::string _type = message["type"];
+      if(_type == "chat")
+      {
+        print_message(message["username"], message["text"], message["timestamp"]);
       }
-      break;
+      else if(_type == "system")
+      {
+        print_message("<system>", message["text"], message.value("timestamp", ""));
+      }
+      else {
+        std::cerr << "Unknown data message type " << type << std::endl;
+      }
     }
-    default:
+    else
     {
       std::cerr << "Unknown server message type " << type << std::endl;
-      break;
     }
   }
 }
@@ -116,13 +104,13 @@ int main(int argc, char* argv[]) {
 
   c.set_open_handler(websocketpp::lib::bind(&on_open, &c, &hdl, ::_1));
 
-  c.set_message_handler(websocketpp::lib::bind(&on_message, &client, ::_1, ::_2));
+  c.set_message_handler(websocketpp::lib::bind(&on_message, &c, ::_1, ::_2));
 
   websocketpp::lib::error_code ec;
   auto connection = c.get_connection(url, ec);
   c.connect(connection);
 
-  websocketpp::lib::thread t1(&c::run, &c);
+  websocketpp::lib::thread t1(&client::run, &c);
 
   std::cout << "Nick: ";
   std::getline(std::cin, nick);
