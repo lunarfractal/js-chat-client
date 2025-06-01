@@ -72,6 +72,7 @@ void on_message(client* c, connection_hdl hdl, message_ptr msg) {
 }
 
 void on_open(client* c, connection_hdl* connection, connection_hdl hdl) {
+  print_message("<system>", "Connected!", ""):
   *connection = hdl;
 }
 
