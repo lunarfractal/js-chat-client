@@ -45,11 +45,9 @@ void on_message(client* c, connection_hdl hdl, message_ptr msg) {
   std::string type = data["type"];
   if(type == "chat")  {
     print_message(data["username"], data["text"], data["timestamp"]);
-    break;
   }
   else if(type == "system") {
     print_message("<system>", data["text"], data.value("timestamp", ""));
-    break;
   }
   else if(type == "history") {
     for(const auto& message: data["messages"]) {
@@ -73,14 +71,15 @@ void on_message(client* c, connection_hdl hdl, message_ptr msg) {
   }
 }
 
-void on_open(Client* client, connection_hdl* connection, connection_hdl hdl) {
+void on_open(client* c, connection_hdl* connection, connection_hdl hdl) {
   *connection = hdl;
 }
 
-websocketpp::lib::shared_ptr<ssl_context> on_tls_init() {
+websocketpp::lib::shared_ptr<ssl_context> on_tls_init(connection_hdl) {
   auto ctx = websocketpp::lib::make_shared<ssl_context>(asio::ssl::context::sslv23);
   return ctx;
 }
+
 
 int main(int argc, char* argv[]) {
   std::string url = "ws://147.185.221.28:61429";
