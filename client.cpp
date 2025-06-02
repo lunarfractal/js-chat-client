@@ -18,8 +18,6 @@ typedef websocketpp::client<websocketpp::config::asio_client> client;
 typedef websocketpp::connection_hdl connection_hdl;
 typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
 
-typedef websocketpp::lib::asio::ssl::context ssl_context;
-
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 
@@ -29,14 +27,14 @@ void print_message(std::string username, std::string text, std::string timestamp
     int term_width = w.ws_col;
 
     std::string user_text = COLOR_BLUE + username + std::string(": ") + COLOR_WHITE + text + COLOR_RESET;
-    std::string time_text = COLOR_GREY + std::string("[") + timestamp + std::string("]") + COLOR_RESET;
+    //std::string time_text = COLOR_GREY + std::string("[") + timestamp + std::string("]") + COLOR_RESET;
 
-    int spacing = term_width - (int)(user_text.length() + time_text.length());
-    if (spacing < 1) spacing = 1;
+    //int spacing = term_width - (int)(user_text.length() + time_text.length());
+    //if (spacing < 1) spacing = 1;
 
-    std::string spaces(spacing, ' ');
+    //std::string spaces(spacing, ' ');
 
-    std::cout << user_text << spaces << time_text << std::endl;
+    std::cout << user_text << std::endl;
 }
 
 void send_text_message(client* c, connection_hdl* connection, std::string msg) {
@@ -79,12 +77,6 @@ void on_open(client* c, connection_hdl* connection, connection_hdl hdl) {
   *connection = hdl;
 }
 
-websocketpp::lib::shared_ptr<ssl_context> on_tls_init(connection_hdl) {
-  auto ctx = websocketpp::lib::make_shared<ssl_context>(asio::ssl::context::sslv23);
-  return ctx;
-}
-
-
 int main(int argc, char* argv[]) {
   std::string url = "ws://147.185.221.28:61429";
 
@@ -94,7 +86,7 @@ int main(int argc, char* argv[]) {
 
   bool done = false;
   std::string input;
-  std::string nick;
+
   client c;
   connection_hdl hdl;
 
@@ -114,9 +106,6 @@ int main(int argc, char* argv[]) {
   c.connect(connection);
 
   websocketpp::lib::thread t1(&client::run, &c);
-
-  std::cout << "Nick: ";
-  std::getline(std::cin, nick);
 
   while (!done) {
     std::getline(std::cin, input);
