@@ -1,10 +1,7 @@
 #define ASIO_STANDALONE
 
 #include <websocketpp/client.hpp>
-#include <websocketpp/config/asio_client.hpp>
-
-#include <unistd.h>
-#include <sys/ioctl.h>
+#include <websocketpp/config/asio_client_no_tls.hpp>
 
 #include <nlohmann/json.hpp>
 
@@ -12,7 +9,6 @@ const std::string COLOR_BLUE = "\033[34m";
 const std::string COLOR_WHITE = "\033[37m";
 const std::string COLOR_GREY = "\033[90m";
 const std::string COLOR_RESET = "\033[0m";
-
 
 typedef websocketpp::client<websocketpp::config::asio_client> client;
 typedef websocketpp::connection_hdl connection_hdl;
